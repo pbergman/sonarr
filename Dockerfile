@@ -9,7 +9,8 @@ RUN apt-get update \
   && gpgconf --kill all \
   && rm -rf "$GNUPGHOME" \
   && apt-key list | grep NzbDrone \
-  && apt-get purge -y --auto-remove gnupg dirmngr
+  && apt-get purge -y --auto-remove gnupg dirmngr \
+  && mkdir -p /usr/lib/nzbdrone/{config,downloads,tv}
 
 
 RUN echo "deb http://apt.sonarr.tv/ master main" > /etc/apt/sources.list.d/sonarr-stable.list \
@@ -18,6 +19,6 @@ RUN echo "deb http://apt.sonarr.tv/ master main" > /etc/apt/sources.list.d/sonar
   && rm -rf /var/lib/apt/lists/* /tmp/*
   
 EXPOSE 8989
+VOLUME ["/usr/lib/nzbdrone/config", "/usr/lib/nzbdrone/downloads", "/usr/lib/nzbdrone/tv"]
 
-ENTRYPOINT ["mono"]
-CMD ["/opt/NzbDrone/NzbDrone.exe"]
+ENTRYPOINT ["mono", "--debug", "/opt/NzbDrone/NzbDrone.exe", "-nobrowser", "-data=/usr/lib/nzbdrone/config"]
